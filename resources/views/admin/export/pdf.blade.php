@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Laporan Kunjungan</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .header h2 {
+            margin: 5px 0;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        .stats {
+            margin: 20px 0;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .stats-grid {
+            display: table;
+            width: 100%;
+        }
+        .stat-item {
+            display: table-cell;
+            width: 20%;
+            text-align: center;
+            padding: 10px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4F46E5;
+        }
+        .stat-label {
+            font-size: 10px;
+            color: #666;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background: #4F46E5;
+            color: white;
+            padding: 8px;
+            text-align: left;
+            font-size: 11px;
+        }
+        td {
+            padding: 6px;
+            border-bottom: 1px solid #ddd;
+            font-size: 10px;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .status {
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .status-diajukan { background: #DBEAFE; color: #1E40AF; }
+        .status-diverifikasi { background: #E0E7FF; color: #4338CA; }
+        .status-menunggu_konfirmasi { background: #FEF3C7; color: #92400E; }
+        .status-dikonfirmasi { background: #EDE9FE; color: #6B21A8; }
+        .status-petugas_ditugaskan { background: #FCE7F3; color: #9F1239; }
+        .status-terlaksana { background: #D1FAE5; color: #065F46; }
+        .status-tidak_terlaksana { background: #FEE2E2; color: #991B1B; }
+        .status-selesai { background: #F3F4F6; color: #374151; }
+        .footer {
+            margin-top: 30px;
+            text-align: right;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+    <table width="100%">
+        <tr>
+        
+        <td width="15%" style="text-align: center;">
+    <img src="{{ public_path('images/Logo_BMKG.png') }}"
+         alt="Logo BMKG"
+         style="width: 70px;">
+</td>
+
+        
+            <td width="70%" style="text-align: center;">
+                <h1 style="margin: 0; font-size: 16px;">
+                    BADAN METEOROLOGI, KLIMATOLOGI, DAN GEOFISIKA
+                </h1>
+                <h2 style="margin: 4px 0; font-size: 14px;">
+                    Stasiun Klimatologi Kelas IV Yogyakarta
+                </h2>
+                <p style="margin: 2px 0; font-size: 10px;">
+                    Jl. Kabupaten No. Km. 5.5, Duwet, Sendangadi, Kec. Mlati, Kabupaten Sleman  
+                </p>
+                <p style="margin: 0; font-size: 10px;">
+                    Daerah Istimewa Yogyakarta 55285
+                </p>
+            </td>
+            <td width="15%"></td>
+        </tr>
+    </table>
+
+    <hr style="border: 1px solid #000; margin: 10px 0 6px;">
+    <hr style="border: 0.5px solid #000; margin: 0;">
+    
+    <h2 style="margin-top: 15px; font-size: 14px;">
+        LAPORAN KUNJUNGAN
+    </h2>
+    <p style="margin: 5px 0; font-size: 11px;">
+        Periode: {{ $period }}
+    </p>
+</div>
+
+
+    <div class="stats">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value">{{ $statistik['total'] }}</div>
+                <div class="stat-label">Total Kunjungan</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ $statistik['diajukan'] }}</div>
+                <div class="stat-label">Diajukan</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ $statistik['terlaksana'] }}</div>
+                <div class="stat-label">Terlaksana</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ $statistik['tidak_terlaksana'] }}</div>
+                <div class="stat-label">Tidak Terlaksana</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{ $statistik['total_peserta'] }}</div>
+                <div class="stat-label">Total Peserta</div>
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th width="3%">No</th>
+                <th width="10%">Tanggal</th>
+                <th width="20%">Instansi</th>
+                <th width="15%">Penanggung Jawab</th>
+                <th width="8%">Peserta</th>
+                <th width="12%">Status</th>
+                <th width="17%">Petugas</th>
+                <th width="15%">Keterangan</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($kunjungan as $index => $item)
+            <tr>
+                <td>{{ $index + 1 }}</td>
+                <td>{{ $item->tanggal_disetujui ? $item->tanggal_disetujui->format('d/m/Y') : $item->tanggal_utama->format('d/m/Y') }}</td>
+                <td>{{ $item->pengunjung->nama_instansi }}</td>
+                <td>{{ $item->pengunjung->nama_penanggung_jawab }}</td>
+                <td style="text-align: center;">{{ $item->jumlah_peserta }}</td>
+                <td>
+                    <span class="status status-{{ $item->status->value }}">
+                        {{ $item->status->label() }}
+                    </span>
+                </td>
+                <td>{{ $item->petugas->pluck('nama')->join(', ') ?: '-' }}</td>
+                <td>{{ Str::limit($item->keterangan_admin ?: '-', 50) }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Dicetak pada: {{ now()->format('d F Y, H:i') }} WIB</p>
+    </div>
+</body>
+</html>
