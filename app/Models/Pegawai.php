@@ -27,12 +27,19 @@ class Pegawai extends Model
         ];
     }
 
-    public function kunjungan()
+    /**
+     * Relasi many-to-many dengan Kunjungan
+     * Satu pegawai bisa ditugaskan ke banyak kunjungan
+     */
+    public function kunjungans()
     {
         return $this->belongsToMany(Kunjungan::class, 'kunjungan_petugas', 'pegawai_id', 'kunjungan_id')
                     ->withTimestamps();
     }
 
+    /**
+     * Scope untuk filter pegawai aktif
+     */
     public function scopeAktif($query)
     {
         return $query->where('status_aktif', true);

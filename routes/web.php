@@ -86,6 +86,15 @@ Route::middleware(['auth', 'role:admin'])
             ->name('kunjungan.update-status');
 
         // Pegawai
+        // PERBAIKAN: Route resource sudah include show, jadi tidak perlu didefinisikan lagi
+        // Route resource akan generate:
+        // GET    /admin/pegawai              -> index   (admin.pegawai.index)
+        // GET    /admin/pegawai/create       -> create  (admin.pegawai.create)
+        // POST   /admin/pegawai              -> store   (admin.pegawai.store)
+        // GET    /admin/pegawai/{pegawai}    -> show    (admin.pegawai.show)
+        // GET    /admin/pegawai/{pegawai}/edit -> edit  (admin.pegawai.edit)
+        // PUT    /admin/pegawai/{pegawai}    -> update  (admin.pegawai.update)
+        // DELETE /admin/pegawai/{pegawai}    -> destroy (admin.pegawai.destroy)
         Route::resource('pegawai', PegawaiController::class);
 
         // Kalender

@@ -69,4 +69,32 @@ class PegawaiController extends Controller
         return redirect()->route('admin.pegawai.index')
             ->with('success', 'Pegawai berhasil dihapus!');
     }
+
+    public function show(Pegawai $pegawai)
+    {
+        // PERBAIKAN: Load relasi tanpa jadwalKunjungans karena tidak ada
+        $pegawai->load(['kunjungans' => function($query) {
+            $query->with(['pengunjung'])
+                  ->latest('tanggal_utama');
+        }]);
+        
+        // Statistik pegawai
+        $totalPenugasan = $pegawai->kunjungans()->count();
+        
+        $penugasanTerlaksana = $pegawai->kunjungans()
+            ->where('status', 'terlaksana')
+            ->count();
+        
+        // PERBAIKAN: Status yang benar
+        $penugasanMenunggu = $pegawai->kunjungans()
+            ->whereIn('status', ['diajukan', 'diverifikasi', 'menunggu_konfirmasi', 'dikonfirmasi', 'petugas_ditugaskan'])
+            ->count();
+        
+        return view('admin.pegawai.show', compact(
+            'pegawai',
+            'totalPenugasan',
+            'penugasanTerlaksana',
+            'penugasanMenunggu'
+        ));
+    }
 }
