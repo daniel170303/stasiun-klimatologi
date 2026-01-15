@@ -12,17 +12,32 @@
         .header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 2px solid #333;
             padding-bottom: 10px;
         }
-        .header h1 {
-            margin: 0;
-            font-size: 18px;
+        .header-table {
+            width: 100%;
+            margin-bottom: 10px;
         }
-        .header h2 {
-            margin: 5px 0;
-            font-size: 14px;
-            font-weight: normal;
+        .logo-cell {
+            width: 15%;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .title-cell {
+            width: 70%;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .spacer-cell {
+            width: 15%;
+        }
+        .divider-thick {
+            border: 1px solid #000;
+            margin: 10px 0 6px;
+        }
+        .divider-thin {
+            border: 0.5px solid #000;
+            margin: 0;
         }
         .stats {
             margin: 20px 0;
@@ -50,24 +65,24 @@
             color: #666;
             margin-top: 5px;
         }
-        table {
+        table.data-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
         }
-        th {
+        table.data-table th {
             background: #4F46E5;
             color: white;
             padding: 8px;
             text-align: left;
             font-size: 11px;
         }
-        td {
+        table.data-table td {
             padding: 6px;
             border-bottom: 1px solid #ddd;
             font-size: 10px;
         }
-        tr:nth-child(even) {
+        table.data-table tr:nth-child(even) {
             background: #f9f9f9;
         }
         .status {
@@ -75,6 +90,7 @@
             border-radius: 3px;
             font-size: 9px;
             font-weight: bold;
+            display: inline-block;
         }
         .status-diajukan { background: #DBEAFE; color: #1E40AF; }
         .status-diverifikasi { background: #E0E7FF; color: #4338CA; }
@@ -88,50 +104,62 @@
             margin-top: 30px;
             text-align: right;
             font-size: 10px;
+            color: #666;
         }
     </style>
 </head>
 <body>
     <div class="header">
-    <table width="100%">
-        <tr>
+        <table class="header-table">
+            <tr>
+                <!-- Logo Column -->
+                <td class="logo-cell">
+                    <!-- Logo Placeholder dengan Gradient -->
+                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 50%, #60A5FA 100%); border-radius: 50%; display: inline-block; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                            <!-- Cloud Icon -->
+                            <div style="background: white; width: 35px; height: 20px; border-radius: 20px; margin: 0 auto 3px; position: relative;">
+                                <div style="position: absolute; top: -8px; left: 8px; background: white; width: 18px; height: 18px; border-radius: 50%;"></div>
+                            </div>
+                            <!-- Text BMKG -->
+                            <div style="color: white; font-size: 9px; font-weight: bold; font-family: Arial, sans-serif; letter-spacing: 1px;">
+                                BMKG
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                
+                <!-- Title Column -->
+                <td class="title-cell">
+                    <h1 style="margin: 0; font-size: 16px; font-weight: bold;">
+                        BADAN METEOROLOGI, KLIMATOLOGI, DAN GEOFISIKA
+                    </h1>
+                    <h2 style="margin: 4px 0; font-size: 14px; font-weight: normal;">
+                        Stasiun Klimatologi Kelas IV Yogyakarta
+                    </h2>
+                    <p style="margin: 2px 0; font-size: 10px; color: #333;">
+                        Jl. Kabupaten No. Km. 5.5, Duwet, Sendangadi, Kec. Mlati, Kabupaten Sleman  
+                    </p>
+                    <p style="margin: 0; font-size: 10px; color: #333;">
+                        Daerah Istimewa Yogyakarta 55285
+                    </p>
+                </td>
+                
+                <!-- Spacer Column -->
+                <td class="spacer-cell"></td>
+            </tr>
+        </table>
+
+        <hr class="divider-thick">
+        <hr class="divider-thin">
         
-        <td width="15%" style="text-align: center;">
-    <img src="{{ public_path('images/Logo_BMKG.png') }}"
-         alt="Logo BMKG"
-         style="width: 70px;">
-</td>
-
-        
-            <td width="70%" style="text-align: center;">
-                <h1 style="margin: 0; font-size: 16px;">
-                    BADAN METEOROLOGI, KLIMATOLOGI, DAN GEOFISIKA
-                </h1>
-                <h2 style="margin: 4px 0; font-size: 14px;">
-                    Stasiun Klimatologi Kelas IV Yogyakarta
-                </h2>
-                <p style="margin: 2px 0; font-size: 10px;">
-                    Jl. Kabupaten No. Km. 5.5, Duwet, Sendangadi, Kec. Mlati, Kabupaten Sleman  
-                </p>
-                <p style="margin: 0; font-size: 10px;">
-                    Daerah Istimewa Yogyakarta 55285
-                </p>
-            </td>
-            <td width="15%"></td>
-        </tr>
-    </table>
-
-    <hr style="border: 1px solid #000; margin: 10px 0 6px;">
-    <hr style="border: 0.5px solid #000; margin: 0;">
-    
-    <h2 style="margin-top: 15px; font-size: 14px;">
-        LAPORAN KUNJUNGAN
-    </h2>
-    <p style="margin: 5px 0; font-size: 11px;">
-        Periode: {{ $period }}
-    </p>
-</div>
-
+        <h2 style="margin-top: 15px; font-size: 14px; font-weight: bold;">
+            LAPORAN KUNJUNGAN
+        </h2>
+        <p style="margin: 5px 0; font-size: 11px; color: #555;">
+            Periode: {{ $period }}
+        </p>
+    </div>
 
     <div class="stats">
         <div class="stats-grid">
@@ -158,7 +186,7 @@
         </div>
     </div>
 
-    <table>
+    <table class="data-table">
         <thead>
             <tr>
                 <th width="3%">No</th>

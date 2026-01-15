@@ -81,15 +81,27 @@ class ExportController extends Controller
             'total_peserta' => $kunjungan->sum('jumlah_peserta'),
         ];
 
+        // Gunakan SVG logo (tidak butuh GD extension)
+        $logoPath = public_path('images/Logo_BMKG.svg');
+        $logoSvg = null;
+        
+        if (file_exists($logoPath)) {
+            // Baca file SVG langsung
+            $logoSvg = file_get_contents($logoPath);
+        }
+
         $pdf = Pdf::loadView('admin.export.pdf', [
                 'kunjungan' => $kunjungan,
                 'statistik' => $statistik,
                 'period' => $this->getPeriodLabel($request),
+                'logoSvg' => $logoSvg, // kirim SVG string ke view
             ])
             ->setPaper('A4', 'portrait')
             ->setOptions([
                 'defaultFont' => 'sans-serif',
-                'isRemoteEnabled' => false, // aman karena pakai public_path
+                'isRemoteEnabled' => true, // PENTING: ubah jadi true
+                'isHtml5ParserEnabled' => true,
+                'isFontSubsettingEnabled' => true,
             ]);
 
         $filename = $this->generateFilename($request, 'pdf');
