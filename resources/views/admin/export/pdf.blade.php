@@ -109,27 +109,19 @@
     </style>
 </head>
 <body>
+
+    {{-- HEADER / KOP --}}
     <div class="header">
         <table class="header-table">
             <tr>
-                <!-- Logo Column -->
+                <!-- LOGO BMKG -->
                 <td class="logo-cell">
-                    <!-- Logo Placeholder dengan Gradient -->
-                    <div style="width: 70px; height: 70px; background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 50%, #60A5FA 100%); border-radius: 50%; display: inline-block; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                            <!-- Cloud Icon -->
-                            <div style="background: white; width: 35px; height: 20px; border-radius: 20px; margin: 0 auto 3px; position: relative;">
-                                <div style="position: absolute; top: -8px; left: 8px; background: white; width: 18px; height: 18px; border-radius: 50%;"></div>
-                            </div>
-                            <!-- Text BMKG -->
-                            <div style="color: white; font-size: 9px; font-weight: bold; font-family: Arial, sans-serif; letter-spacing: 1px;">
-                                BMKG
-                            </div>
-                        </div>
-                    </div>
+                    <img src="{{ public_path('images/Logo_BMKG.png') }}"
+                         alt="Logo BMKG"
+                         style="width:70px; height:auto;">
                 </td>
-                
-                <!-- Title Column -->
+
+                <!-- JUDUL -->
                 <td class="title-cell">
                     <h1 style="margin: 0; font-size: 16px; font-weight: bold;">
                         BADAN METEOROLOGI, KLIMATOLOGI, DAN GEOFISIKA
@@ -138,21 +130,20 @@
                         Stasiun Klimatologi Kelas IV Yogyakarta
                     </h2>
                     <p style="margin: 2px 0; font-size: 10px; color: #333;">
-                        Jl. Kabupaten No. Km. 5.5, Duwet, Sendangadi, Kec. Mlati, Kabupaten Sleman  
+                        Jl. Kabupaten No. Km. 5.5, Duwet, Sendangadi, Kec. Mlati, Kabupaten Sleman
                     </p>
                     <p style="margin: 0; font-size: 10px; color: #333;">
                         Daerah Istimewa Yogyakarta 55285
                     </p>
                 </td>
-                
-                <!-- Spacer Column -->
+
                 <td class="spacer-cell"></td>
             </tr>
         </table>
 
         <hr class="divider-thick">
         <hr class="divider-thin">
-        
+
         <h2 style="margin-top: 15px; font-size: 14px; font-weight: bold;">
             LAPORAN KUNJUNGAN
         </h2>
@@ -161,6 +152,7 @@
         </p>
     </div>
 
+    {{-- STATISTIK --}}
     <div class="stats">
         <div class="stats-grid">
             <div class="stat-item">
@@ -186,6 +178,7 @@
         </div>
     </div>
 
+    {{-- TABEL DATA --}}
     <table class="data-table">
         <thead>
             <tr>
@@ -203,10 +196,14 @@
             @foreach($kunjungan as $index => $item)
             <tr>
                 <td>{{ $index + 1 }}</td>
-                <td>{{ $item->tanggal_disetujui ? $item->tanggal_disetujui->format('d/m/Y') : $item->tanggal_utama->format('d/m/Y') }}</td>
+                <td>
+                    {{ $item->tanggal_disetujui 
+                        ? $item->tanggal_disetujui->format('d/m/Y') 
+                        : $item->tanggal_utama->format('d/m/Y') }}
+                </td>
                 <td>{{ $item->pengunjung->nama_instansi }}</td>
                 <td>{{ $item->pengunjung->nama_penanggung_jawab }}</td>
-                <td style="text-align: center;">{{ $item->jumlah_peserta }}</td>
+                <td style="text-align:center;">{{ $item->jumlah_peserta }}</td>
                 <td>
                     <span class="status status-{{ $item->status->value }}">
                         {{ $item->status->label() }}
@@ -219,8 +216,10 @@
         </tbody>
     </table>
 
+    {{-- FOOTER --}}
     <div class="footer">
         <p>Dicetak pada: {{ now()->format('d F Y, H:i') }} WIB</p>
     </div>
+
 </body>
 </html>
