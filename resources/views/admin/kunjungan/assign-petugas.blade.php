@@ -55,18 +55,29 @@
                     </p>
                 </div>
 
-                <!-- Filter Keahlian -->
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Filter Keahlian</label>
-                    <select id="filterKeahlian" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                        <option value="">Semua Keahlian</option>
-                        @php
-                            $keahlianList = $pegawaiList->pluck('keahlian')->filter()->unique()->sort();
-                        @endphp
-                        @foreach($keahlianList as $keahlian)
-                        <option value="{{ $keahlian }}">{{ $keahlian }}</option>
-                        @endforeach
-                    </select>
+                <!-- Filter & Sort Options -->
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Filter Keahlian</label>
+                        <select id="filterKeahlian" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="">Semua Keahlian</option>
+                            @php
+                                $keahlianList = $pegawaiList->pluck('keahlian')->filter()->unique()->sort();
+                            @endphp
+                            @foreach($keahlianList as $keahlian)
+                            <option value="{{ $keahlian }}">{{ $keahlian }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Urutkan Berdasarkan</label>
+                        <select id="sortBy" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="tugas_asc">Tugas Paling Sedikit</option>
+                            <option value="tugas_desc">Tugas Paling Banyak</option>
+                            <option value="nama_asc">Nama A-Z</option>
+                            <option value="nama_desc">Nama Z-A</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Pegawai List -->
@@ -75,7 +86,8 @@
                     <label class="pegawai-item flex items-start p-4 border rounded-lg cursor-pointer hover:bg-white transition bg-white"
                            data-nama="{{ strtolower($pegawai->nama) }}"
                            data-email="{{ strtolower($pegawai->email) }}"
-                           data-keahlian="{{ strtolower($pegawai->keahlian ?? '') }}">
+                           data-keahlian="{{ strtolower($pegawai->keahlian ?? '') }}"
+                           data-tugas="{{ $pegawai->kunjungans_count ?? 0 }}">
                         <input type="checkbox" 
                                name="pegawai_ids[]" 
                                value="{{ $pegawai->id }}"
@@ -83,9 +95,20 @@
                                class="pegawai-checkbox mt-1 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                         <div class="ml-3 flex-1">
                             <div class="flex justify-between items-start">
-                                <div>
-                                    <p class="font-medium text-gray-900">{{ $pegawai->nama }}</p>
-                                    <p class="text-sm text-gray-600">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <p class="font-medium text-gray-900">{{ $pegawai->nama }}</p>
+                                        @php
+                                            $jumlahTugas = $pegawai->kunjungans_count ?? 0;
+                                        @endphp
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $jumlahTugas == 0 ? 'bg-green-100 text-green-800' : ($jumlahTugas <= 3 ? 'bg-blue-100 text-blue-800' : 'bg-orange-100 text-orange-800') }}">
+                                            <svg class="h-3 w-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                            </svg>
+                                            {{ $jumlahTugas }} tugas
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mt-1">
                                         <span class="inline-flex items-center">
                                             <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -137,6 +160,25 @@
                         Pilih minimal 2 dan maksimal 3 petugas untuk kunjungan ini
                     </span>
                 </p>
+
+                <!-- Legend Info -->
+                <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                    <p class="text-xs font-medium text-blue-900 mb-2">Keterangan Badge Tugas:</p>
+                    <div class="flex flex-wrap gap-3 text-xs">
+                        <span class="inline-flex items-center">
+                            <span class="w-3 h-3 bg-green-500 rounded-full mr-1"></span>
+                            <span class="text-gray-700">Hijau = Belum ada tugas (0)</span>
+                        </span>
+                        <span class="inline-flex items-center">
+                            <span class="w-3 h-3 bg-blue-500 rounded-full mr-1"></span>
+                            <span class="text-gray-700">Biru = Sedikit tugas (1-3)</span>
+                        </span>
+                        <span class="inline-flex items-center">
+                            <span class="w-3 h-3 bg-orange-500 rounded-full mr-1"></span>
+                            <span class="text-gray-700">Orange = Banyak tugas (>3)</span>
+                        </span>
+                    </div>
+                </div>
             </div>
 
             @if($pegawaiList->count() >= 2)
@@ -163,6 +205,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchPegawai');
     const filterKeahlian = document.getElementById('filterKeahlian');
+    const sortBy = document.getElementById('sortBy');
     const pegawaiItems = document.querySelectorAll('.pegawai-item');
     const pegawaiContainer = document.getElementById('pegawaiContainer');
     const noResults = document.getElementById('noResults');
@@ -170,6 +213,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedCountSpan = document.querySelector('#selectedCount span');
     const submitBtn = document.getElementById('submitBtn');
     const form = document.getElementById('assignForm');
+
+    // Sort Function
+    function sortPegawai() {
+        const sortValue = sortBy.value;
+        const itemsArray = Array.from(pegawaiItems);
+        
+        itemsArray.sort((a, b) => {
+            switch(sortValue) {
+                case 'tugas_asc':
+                    return parseInt(a.dataset.tugas) - parseInt(b.dataset.tugas);
+                case 'tugas_desc':
+                    return parseInt(b.dataset.tugas) - parseInt(a.dataset.tugas);
+                case 'nama_asc':
+                    return a.dataset.nama.localeCompare(b.dataset.nama);
+                case 'nama_desc':
+                    return b.dataset.nama.localeCompare(a.dataset.nama);
+                default:
+                    return 0;
+            }
+        });
+        
+        // Re-append sorted items
+        itemsArray.forEach(item => {
+            pegawaiContainer.appendChild(item);
+        });
+    }
 
     // Search Function
     function filterPegawai() {
@@ -226,6 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Event Listeners
     searchInput.addEventListener('input', filterPegawai);
     filterKeahlian.addEventListener('change', filterPegawai);
+    sortBy.addEventListener('change', sortPegawai);
     
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
@@ -258,7 +328,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Initialize count on page load
+    // Initialize
+    sortPegawai(); // Sort on page load (default: tugas paling sedikit)
     updateSelectedCount();
 
     // Keyboard shortcut: Ctrl/Cmd + F to focus search

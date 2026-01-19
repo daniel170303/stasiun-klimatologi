@@ -80,7 +80,20 @@ class KunjunganController extends Controller
             return redirect()->back()->with('error', 'Kunjungan belum dikonfirmasi oleh pengunjung.');
         }
 
-        $pegawaiList = Pegawai::aktif()->get();
+        // Ambil pegawai aktif dengan jumlah kunjungan dan urutkan dari yang paling sedikit
+        $pegawaiList = Pegawai::aktif()
+            ->withCount(['kunjungans' => function($query) {
+                // Hitung hanya kunjungan yang statusnya aktif/relevan
+                $query->whereIn('status', [
+                    'dikonfirmasi',
+                    'petugas_ditugaskan',
+                    'terlaksana',
+                    'selesai' // ← TAMBAHAN INI
+                ]);
+            }])
+            ->orderBy('kunjungans_count', 'asc') // Urutkan dari yang paling sedikit
+            ->orderBy('nama', 'asc') // Jika sama, urutkan berdasarkan nama
+            ->get();
 
         return view('admin.kunjungan.assign-petugas', compact('kunjungan', 'pegawaiList'));
     }

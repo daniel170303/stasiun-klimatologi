@@ -111,21 +111,6 @@
                     </a>
                 </div>
                 @endguest
-
-                <!-- Stats Section -->
-                <div class="grid grid-cols-3 gap-6 max-w-2xl mx-auto mt-16">
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold text-indigo-600 mb-2">100+</div>
-                        <div class="text-sm text-gray-600">Instansi Terdaftar</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold text-purple-600 mb-2">500+</div>
-                        <div class="text-sm text-gray-600">Kunjungan Sukses</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-3xl md:text-4xl font-bold text-pink-600 mb-2">24/7</div>
-                        <div class="text-sm text-gray-600">Akses Sistem</div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -366,7 +351,7 @@
                 <p class="text-gray-600 mb-6">
                     Hubungi kami melalui WhatsApp untuk informasi lebih lanjut atau bantuan teknis
                 </p>
-                <a href="https://wa.me/6281234567890" target="_blank"
+                <a href="https://wa.me/628112638113" target="_blank"
                    class="inline-flex items-center justify-center gap-3 px-8 py-4 bg-green-500 text-white rounded-xl font-semibold hover:bg-green-600 transition duration-200 shadow-lg hover:shadow-xl transform hover:scale-105">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M20.52 3.48A11.91 11.91 0 0012.05 0C5.5 0 .2 5.3.2 11.85c0 2.1.55 4.15 1.6 5.95L0 24l6.4-1.7a11.85 11.85 0 005.65 1.45h.05c6.55 0 11.85-5.3 11.85-11.85 0-3.15-1.25-6.1-3.43-8.42z"/>
@@ -421,7 +406,7 @@
     @endguest
 
     <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/6281234567890" target="_blank"
+    <a href="https://wa.me/628112638113" target="_blank"
        class="fixed bottom-6 right-6 z-50 w-16 h-16 rounded-full bg-green-500 shadow-2xl flex items-center justify-center text-white hover:scale-110 hover:bg-green-600 transition duration-300 group">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-9 h-9" fill="currentColor" viewBox="0 0 24 24">
             <path d="M20.52 3.48A11.91 11.91 0 0012.05 0C5.5 0 .2 5.3.2 11.85c0 2.1.55 4.15 1.6 5.95L0 24l6.4-1.7a11.85 11.85 0 005.65 1.45h.05c6.55 0 11.85-5.3 11.85-11.85 0-3.15-1.25-6.1-3.43-8.42z"/>
