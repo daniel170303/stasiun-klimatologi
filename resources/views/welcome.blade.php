@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Stasiun Klimatologi IV</title>
+    <title>Stasiun Klimatologi IV Yogyakarta - Beranda</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         @keyframes float {
@@ -30,43 +30,8 @@
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen">
     
-    <!-- Navigation - Sticky with backdrop blur -->
-    <nav class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition duration-300">
-                        <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
-                        </svg>
-                    </div>
-                    <div>
-                        <span class="text-xl font-bold text-gray-900">Stasiun Klimatologi IV</span>
-                        <p class="text-xs text-gray-500">BMKG Indonesia</p>
-                    </div>
-                </div>
-                
-                @if (Route::has('login'))
-                <div class="flex items-center space-x-3">
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="px-5 py-2.5 text-gray-700 hover:text-indigo-600 font-semibold rounded-lg hover:bg-indigo-50 transition duration-200">
-                            Dashboard
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}" class="px-5 py-2.5 text-gray-700 hover:text-indigo-600 font-semibold rounded-lg hover:bg-gray-100 transition duration-200">
-                            Masuk
-                        </a>
-                        @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
-                            Daftar Sekarang
-                        </a>
-                        @endif
-                    @endauth
-                </div>
-                @endif
-            </div>
-        </div>
-    </nav>
+    {{-- NAVBAR --}}
+    @include('layouts.navigation')
 
     <!-- Hero Section - Enhanced with better spacing -->
     <div class="relative overflow-hidden">
@@ -111,7 +76,6 @@
                     </a>
                 </div>
                 @endguest
-                </div>
             </div>
         </div>
     </div>
@@ -455,7 +419,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                             </svg>
-                            <span>Jl. Klimatologi No. 1, Kota</span>
+                            <span>Jl. Klimatologi No. 1, Yogyakarta</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
