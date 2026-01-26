@@ -55,8 +55,8 @@
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
-                            <dt class="text-sm font-medium text-gray-500 truncate">Terlaksana</dt>
-                            <dd class="text-2xl font-semibold text-gray-900">{{ $kunjunganTerlaksana }}</dd>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Selesai</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">{{ $kunjunganSelesai }}</dd>
                         </dl>
                     </div>
                 </div>

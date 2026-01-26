@@ -116,9 +116,11 @@
             <tr>
                 <!-- LOGO BMKG -->
                 <td class="logo-cell">
-                    <img src="{{ public_path('images/Logo_BMKG.png') }}"
-                         alt="Logo BMKG"
-                         style="width:70px; height:auto;">
+                    @if(isset($logoBase64) && $logoBase64)
+                        <img src="{{ $logoBase64 }}"
+                             alt="Logo BMKG"
+                             style="width:70px; height:auto;">
+                    @endif
                 </td>
 
                 <!-- JUDUL -->
@@ -164,8 +166,8 @@
                 <div class="stat-label">Diajukan</div>
             </div>
             <div class="stat-item">
-                <div class="stat-value">{{ $statistik['terlaksana'] }}</div>
-                <div class="stat-label">Terlaksana</div>
+                <div class="stat-value">{{ $statistik['selesai'] }}</div>
+                <div class="stat-label">Selesai</div>
             </div>
             <div class="stat-item">
                 <div class="stat-value">{{ $statistik['tidak_terlaksana'] }}</div>

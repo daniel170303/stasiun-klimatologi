@@ -1,96 +1,124 @@
 <?php
 
-namespace App\Exports;
+namespace App\Http\Controllers\Admin;
 
 use App\Models\Kunjungan;
-use Maatwebsite\Excel\Concerns\FromCollection;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithStyles;
-use Maatwebsite\Excel\Concerns\WithColumnWidths;
-use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Illuminate\Http\Request;
+use PDF; // atau use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
-class KunjunganExport implements FromCollection, WithHeadings, WithMapping, WithStyles, WithColumnWidths
+class ExportController extends Controller
 {
-    protected $dateRange;
-
-    public function __construct($dateRange)
+    public function pdf(Request $request)
     {
-        $this->dateRange = $dateRange;
-    }
+        // Validasi
+        $request->validate([
+            'period_type' => 'required|in:month,year,custom',
+            'year' => 'required|integer',
+            'month' => 'required_if:period_type,month|nullable|integer|between:1,12',
+            'start_date' => 'required_if:period_type,custom|nullable|date',
+            'end_date' => 'required_if:period_type,custom|nullable|date|after_or_equal:start_date',
+        ]);
 
-    public function collection()
-    {
-        return Kunjungan::with(['pengunjung', 'petugas'])
-            ->whereBetween('created_at', $this->dateRange)
+        // Tentukan date range
+        $dateRange = $this->getDateRange($request);
+        
+        // Ambil data
+        $kunjungan = Kunjungan::with(['pengunjung', 'petugas'])
+            ->whereBetween('created_at', $dateRange)
             ->orderBy('created_at', 'desc')
             ->get();
+
+        // Statistik
+        $statistik = [
+            'total' => $kunjungan->count(),
+            'diajukan' => $kunjungan->where('status', 'diajukan')->count(),
+            'terlaksana' => $kunjungan->where('status', 'terlaksana')->count(),
+            'tidak_terlaksana' => $kunjungan->where('status', 'tidak_terlaksana')->count(),
+            'total_peserta' => $kunjungan->sum('jumlah_peserta'),
+        ];
+
+        // Format periode untuk judul
+        $period = $this->formatPeriod($request);
+
+        // Data untuk view
+        $data = [
+            'kunjungan' => $kunjungan,
+            'statistik' => $statistik,
+            'period' => $period,
+        ];
+
+        // KONVERSI LOGO KE BASE64 LANGSUNG DI CONTROLLER
+        $logoPath = public_path('images/Logo_BMKG.png');
+        if (file_exists($logoPath)) {
+            $imageData = base64_encode(file_get_contents($logoPath));
+            $data['logoBase64'] = 'data:image/png;base64,' . $imageData;
+        } else {
+            $data['logoBase64'] = null;
+        }
+
+        // Generate PDF dengan konfigurasi khusus
+        $pdf = PDF::loadView('admin.export.pdf', $data);
+        
+        // KONFIGURASI PENTING UNTUK BYPASS GD
+        $pdf->setPaper('A4', 'landscape');
+        
+        // Set options untuk DomPDF
+        $pdf->setOptions([
+            'isHtml5ParserEnabled' => true,
+            'isRemoteEnabled' => false, // Karena pakai base64, tidak perlu remote
+            'isFontSubsettingEnabled' => true,
+            'isPhpEnabled' => false, // Tidak perlu PHP di PDF
+            'debugKeepTemp' => false,
+        ]);
+
+        // Download
+        $filename = 'Laporan_Kunjungan_' . now()->format('Y-m-d_His') . '.pdf';
+        return $pdf->download($filename);
     }
 
-    public function headings(): array
+    private function getDateRange(Request $request)
     {
-        return [
-            'No',
-            'Tanggal Pengajuan',
-            'Nama Instansi',
-            'Penanggung Jawab',
-            'Email',
-            'No. HP',
-            'Tanggal Kunjungan',
-            'Tanggal Disetujui',
-            'Jumlah Peserta',
-            'Tujuan',
-            'Status',
-            'Petugas',
-            'Keterangan',
-        ];
+        switch ($request->period_type) {
+            case 'month':
+                $start = Carbon::create($request->year, $request->month, 1)->startOfMonth();
+                $end = Carbon::create($request->year, $request->month, 1)->endOfMonth();
+                break;
+            
+            case 'year':
+                $start = Carbon::create($request->year, 1, 1)->startOfYear();
+                $end = Carbon::create($request->year, 12, 31)->endOfYear();
+                break;
+            
+            case 'custom':
+                $start = Carbon::parse($request->start_date)->startOfDay();
+                $end = Carbon::parse($request->end_date)->endOfDay();
+                break;
+            
+            default:
+                $start = now()->startOfMonth();
+                $end = now()->endOfMonth();
+        }
+
+        return [$start, $end];
     }
 
-    public function map($kunjungan): array
+    private function formatPeriod(Request $request)
     {
-        static $no = 0;
-        $no++;
-
-        return [
-            $no,
-            $kunjungan->created_at->format('d/m/Y H:i'),
-            $kunjungan->pengunjung->nama_instansi,
-            $kunjungan->pengunjung->nama_penanggung_jawab,
-            $kunjungan->pengunjung->email,
-            $kunjungan->pengunjung->no_hp,
-            $kunjungan->tanggal_utama->format('d/m/Y'),
-            $kunjungan->tanggal_disetujui ? $kunjungan->tanggal_disetujui->format('d/m/Y') : '-',
-            $kunjungan->jumlah_peserta,
-            $kunjungan->tujuan_kunjungan,
-            $kunjungan->status->label(),
-            $kunjungan->petugas->pluck('nama')->join(', ') ?: '-',
-            $kunjungan->keterangan_admin ?: '-',
-        ];
-    }
-
-    public function styles(Worksheet $sheet)
-    {
-        return [
-            1 => ['font' => ['bold' => true, 'size' => 12]],
-        ];
-    }
-
-    public function columnWidths(): array
-    {
-        return [
-            'A' => 5,
-            'B' => 18,
-            'C' => 30,
-            'D' => 25,
-            'E' => 25,
-            'F' => 15,
-            'G' => 15,
-            'H' => 15,
-            'I' => 10,
-            'J' => 40,
-            'K' => 20,
-            'L' => 30,
-            'M' => 30,
-        ];
+        switch ($request->period_type) {
+            case 'month':
+                return Carbon::create($request->year, $request->month, 1)->format('F Y');
+            
+            case 'year':
+                return 'Tahun ' . $request->year;
+            
+            case 'custom':
+                $start = Carbon::parse($request->start_date)->format('d M Y');
+                $end = Carbon::parse($request->end_date)->format('d M Y');
+                return $start . ' - ' . $end;
+            
+            default:
+                return now()->format('F Y');
+        }
     }
 }

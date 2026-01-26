@@ -76,7 +76,7 @@ class ExportController extends Controller
         $statistik = [
             'total' => $kunjungan->count(),
             'diajukan' => $kunjungan->where('status', 'diajukan')->count(),
-            'terlaksana' => $kunjungan->where('status', 'terlaksana')->count(),
+            'selesai' => $kunjungan->where('status', 'selesai')->count(),
             'tidak_terlaksana' => $kunjungan->where('status', 'tidak_terlaksana')->count(),
             'total_peserta' => $kunjungan->sum('jumlah_peserta'),
         ];

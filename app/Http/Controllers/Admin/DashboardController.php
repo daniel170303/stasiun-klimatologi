@@ -14,7 +14,7 @@ class DashboardController extends Controller
     {
         $totalKunjungan = Kunjungan::count();
         $kunjunganDiajukan = Kunjungan::where('status', StatusKunjungan::DIAJUKAN)->count();
-        $kunjunganTerlaksana = Kunjungan::where('status', StatusKunjungan::TERLAKSANA)->count();
+        $kunjunganSelesai = Kunjungan::where('status', StatusKunjungan::SELESAI)->count();
         $totalPengunjung = Pengunjung::count();
         $totalPegawai = Pegawai::aktif()->count();
         
@@ -33,7 +33,7 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact(
             'totalKunjungan',
             'kunjunganDiajukan',
-            'kunjunganTerlaksana',
+            'kunjunganSelesai',
             'totalPengunjung',
             'totalPegawai',
             'kunjunganTerbaru',
