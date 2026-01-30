@@ -3,16 +3,25 @@
 namespace App\Http\Requests;
 
 use App\Models\Kunjungan;
+use App\Enums\StatusKunjungan;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class KunjunganRequest extends FormRequest
 {
+    /**
+     * Determine if the user is authorized to make this request.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
     public function rules(): array
     {
         return [
@@ -21,6 +30,12 @@ class KunjunganRequest extends FormRequest
                 'date', 
                 'after:today',
                 function ($attribute, $value, $fail) {
+                    // Check if weekend
+                    if ($this->isWeekend($value)) {
+                        $fail('Tanggal ' . Carbon::parse($value)->format('d F Y') . ' adalah hari libur (Sabtu/Minggu). Silakan pilih hari kerja.');
+                    }
+                    
+                    // Check if date is occupied
                     if ($this->isDateOccupied($value)) {
                         $fail('Tanggal ' . Carbon::parse($value)->format('d F Y') . ' sudah ada kunjungan yang diverifikasi. Silakan pilih tanggal lain.');
                     }
@@ -31,8 +46,16 @@ class KunjunganRequest extends FormRequest
                 'date', 
                 'after:today',
                 function ($attribute, $value, $fail) {
-                    if ($value && $this->isDateOccupied($value)) {
-                        $fail('Tanggal alternatif ' . Carbon::parse($value)->format('d F Y') . ' sudah ada kunjungan yang diverifikasi. Silakan pilih tanggal lain.');
+                    if ($value) {
+                        // Check if weekend
+                        if ($this->isWeekend($value)) {
+                            $fail('Tanggal alternatif ' . Carbon::parse($value)->format('d F Y') . ' adalah hari libur (Sabtu/Minggu). Silakan pilih hari kerja.');
+                        }
+                        
+                        // Check if date is occupied
+                        if ($this->isDateOccupied($value)) {
+                            $fail('Tanggal alternatif ' . Carbon::parse($value)->format('d F Y') . ' sudah ada kunjungan yang diverifikasi. Silakan pilih tanggal lain.');
+                        }
                     }
                 },
             ],
@@ -42,6 +65,11 @@ class KunjunganRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
     public function messages(): array
     {
         return [
@@ -52,6 +80,7 @@ class KunjunganRequest extends FormRequest
             'jumlah_peserta.min' => 'Jumlah peserta minimal 1 orang.',
             'jumlah_peserta.max' => 'Jumlah peserta maksimal 100 orang.',
             'tujuan_kunjungan.required' => 'Tujuan kunjungan wajib diisi.',
+            'tujuan_kunjungan.max' => 'Tujuan kunjungan maksimal 1000 karakter.',
             'surat_permohonan.required' => 'Surat permohonan wajib diunggah.',
             'surat_permohonan.mimes' => 'Surat permohonan harus berformat PDF.',
             'surat_permohonan.max' => 'Ukuran file maksimal 2MB.',
@@ -59,18 +88,33 @@ class KunjunganRequest extends FormRequest
     }
 
     /**
+     * Check if date is a weekend (Saturday or Sunday)
+     *
+     * @param string $date
+     * @return bool
+     */
+    private function isWeekend($date): bool
+    {
+        $dayOfWeek = Carbon::parse($date)->dayOfWeek;
+        // 0 = Sunday, 6 = Saturday
+        return in_array($dayOfWeek, [0, 6]);
+    }
+
+    /**
      * Check if date is already occupied by verified visit
+     *
+     * @param string $date
+     * @return bool
      */
     private function isDateOccupied($date): bool
     {
-        return Kunjungan::where(function($query) use ($date) {
-            $query->where('tanggal_disetujui', $date)
-                  ->whereIn('status', [
-                      'menunggu_konfirmasi',
-                      'dikonfirmasi', 
-                      'petugas_ditugaskan',
-                      'terlaksana'
-                  ]);
-        })->exists();
+        return Kunjungan::where('tanggal_disetujui', $date)
+            ->whereIn('status', [
+                StatusKunjungan::MENUNGGU_KONFIRMASI,
+                StatusKunjungan::DIKONFIRMASI, 
+                StatusKunjungan::PETUGAS_DITUGASKAN,
+                StatusKunjungan::TERLAKSANA
+            ])
+            ->exists();
     }
 }
