@@ -72,8 +72,8 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Urutkan Berdasarkan</label>
                         <select id="sortBy" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <option value="tugas_asc">Tugas Paling Sedikit</option>
-                            <option value="tugas_desc">Tugas Paling Banyak</option>
+                            <option value="tugas_asc">Frekuensi Paling Sedikit</option>
+                            <option value="tugas_desc">Frekuensi Paling Banyak</option>
                             <option value="nama_asc">Nama A-Z</option>
                             <option value="nama_desc">Nama Z-A</option>
                         </select>

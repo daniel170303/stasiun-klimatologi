@@ -57,7 +57,7 @@
                 @error('tanggal_utama')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
-                <p class="mt-1 text-sm text-gray-500">Tidak dapat memilih hari Sabtu dan Minggu</p>
+                <p class="mt-1 text-sm text-gray-500">Hanya dapat memilih hari Senin sampai Kamis</p>
             </div>
 
             <!-- Tanggal Alternatif -->
@@ -74,7 +74,7 @@
                 @error('tanggal_alternatif')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
-                <p class="mt-1 text-sm text-gray-500">Jika tanggal utama tidak tersedia (hanya hari kerja)</p>
+                <p class="mt-1 text-sm text-gray-500">Jika tanggal utama tidak tersedia (hanya Senin-Kamis)</p>
             </div>
 
             <!-- Jumlah Peserta -->
@@ -134,7 +134,7 @@
                 <h3 class="text-sm font-medium text-blue-800 mb-2">Informasi Penting:</h3>
                 <ul class="list-disc list-inside text-sm text-blue-700 space-y-1">
                     <li>Pastikan tanggal kunjungan minimal H+1 dari hari ini</li>
-                    <li>Kunjungan hanya dapat dilakukan pada hari kerja (Senin-Jumat)</li>
+                    <li>Kunjungan hanya dapat dilakukan pada hari Senin sampai Kamis</li>
                     <li>Surat permohonan harus menggunakan kop instansi resmi</li>
                     <li>Admin akan memverifikasi dan memberitahu ketersediaan tanggal</li>
                     <li>Anda akan menerima notifikasi email setelah pengajuan diproses</li>
@@ -170,7 +170,20 @@ document.addEventListener('DOMContentLoaded', function() {
     let previousAlternatif = tanggalAlternatif ? tanggalAlternatif.value : '';
     
     /**
-     * Check if date is weekend (Saturday or Sunday)
+     * Check if date is valid day (Monday-Thursday only)
+     * @param {string} dateString - Date in YYYY-MM-DD format
+     * @return {boolean}
+     */
+    function isValidDay(dateString) {
+        if (!dateString) return false;
+        const date = new Date(dateString + 'T00:00:00');
+        const day = date.getDay();
+        // 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday
+        return day >= 1 && day <= 4;
+    }
+    
+    /**
+     * Check if date is weekend (Saturday or Sunday) - for backward compatibility
      * @param {string} dateString - Date in YYYY-MM-DD format
      * @return {boolean}
      */
@@ -230,11 +243,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return selectedDate;
         }
         
-        // Check if weekend
-        if (isWeekend(selectedDate)) {
+        // Check if valid day (Monday-Thursday only)
+        if (!isValidDay(selectedDate)) {
             const dayName = getDayName(selectedDate);
             const formattedDate = formatDate(selectedDate);
-            alert(`Tidak dapat memilih hari ${dayName}, ${formattedDate}.\n\nKunjungan hanya dapat dilakukan pada hari kerja (Senin-Jumat).`);
+            alert(`Tidak dapat memilih hari ${dayName}, ${formattedDate}.\n\nKunjungan hanya dapat dilakukan pada hari Senin sampai Kamis.`);
             input.value = previousValue;
             return previousValue;
         }

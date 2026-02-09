@@ -67,13 +67,31 @@
         </div>
     </div>
 
-    <div class="bg-white shadow rounded-lg p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold text-gray-900">Kunjungan Terbaru</h2>
-            <a href="{{ route('pengunjung.kunjungan.index') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
-                Lihat Semua →
-            </a>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Kalender -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Kalender Kunjungan</h2>
+            <div id="calendar-container" class="mb-4"></div>
+            <div class="flex items-center gap-4 text-sm">
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-red-500 rounded"></div>
+                    <span class="text-gray-600">Tanggal Terisi</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <div class="w-4 h-4 bg-gray-200 rounded"></div>
+                    <span class="text-gray-600">Tanggal Tersedia</span>
+                </div>
+            </div>
         </div>
+
+        <!-- Kunjungan Terbaru -->
+        <div class="bg-white shadow rounded-lg p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-900">Kunjungan Terbaru</h2>
+                <a href="{{ route('pengunjung.kunjungan.index') }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                    Lihat Semua →
+                </a>
+            </div>
 
         <div class="space-y-4">
             @forelse($kunjunganTerbaru as $kunjungan)
@@ -119,4 +137,82 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const occupiedDates = @json($occupiedDates ?? []);
+    
+    // Simple calendar implementation
+    const calendarContainer = document.getElementById('calendar-container');
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    function renderCalendar(month, year) {
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        
+        let calendarHTML = '<div class="mb-4 flex justify-between items-center">';
+        calendarHTML += '<button onclick="changeMonth(-1)" class="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200">‹</button>';
+        calendarHTML += `<h3 class="font-semibold">${new Date(year, month).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })}</h3>`;
+        calendarHTML += '<button onclick="changeMonth(1)" class="px-3 py-1 bg-gray-100 rounded hover:bg-gray-200">›</button>';
+        calendarHTML += '</div>';
+        
+        calendarHTML += '<div class="grid grid-cols-7 gap-1 text-center text-xs mb-2">';
+        const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+        dayNames.forEach(day => {
+            calendarHTML += `<div class="font-semibold text-gray-600 py-1">${day}</div>`;
+        });
+        calendarHTML += '</div>';
+        
+        calendarHTML += '<div class="grid grid-cols-7 gap-1">';
+        
+        // Empty cells for days before month starts
+        for (let i = 0; i < firstDay; i++) {
+            calendarHTML += '<div class="aspect-square"></div>';
+        }
+        
+        // Days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isOccupied = occupiedDates.includes(dateStr);
+            const isPast = new Date(year, month, day) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            const isToday = year === today.getFullYear() && month === today.getMonth() && day === today.getDate();
+            
+            let cellClass = 'aspect-square flex items-center justify-center rounded text-sm ';
+            if (isOccupied) {
+                cellClass += 'bg-red-500 text-white font-semibold';
+            } else if (isPast) {
+                cellClass += 'bg-gray-100 text-gray-400';
+            } else if (isToday) {
+                cellClass += 'bg-indigo-100 text-indigo-700 font-semibold border-2 border-indigo-500';
+            } else {
+                cellClass += 'bg-gray-50 text-gray-700 hover:bg-gray-100';
+            }
+            
+            calendarHTML += `<div class="${cellClass}">${day}</div>`;
+        }
+        
+        calendarHTML += '</div>';
+        calendarContainer.innerHTML = calendarHTML;
+    }
+    
+    let currentMonthIndex = currentMonth;
+    let currentYearIndex = currentYear;
+    
+    window.changeMonth = function(direction) {
+        currentMonthIndex += direction;
+        if (currentMonthIndex < 0) {
+            currentMonthIndex = 11;
+            currentYearIndex--;
+        } else if (currentMonthIndex > 11) {
+            currentMonthIndex = 0;
+            currentYearIndex++;
+        }
+        renderCalendar(currentMonthIndex, currentYearIndex);
+    };
+    
+    renderCalendar(currentMonthIndex, currentYearIndex);
+});
+</script>
 @endsection

@@ -20,6 +20,7 @@ class Kunjungan extends Model
         'tanggal_disetujui',
         'jumlah_peserta',
         'surat_permohonan',
+        'foto_kunjungan',
         'status',
         'keterangan_admin',
         'tujuan_kunjungan',

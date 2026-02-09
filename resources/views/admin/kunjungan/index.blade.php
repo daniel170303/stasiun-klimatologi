@@ -6,6 +6,9 @@
 <div class="space-y-6">
     <div class="flex justify-between items-center">
         <h1 class="text-3xl font-bold text-gray-900">Kelola Kunjungan</h1>
+        <a href="{{ route('admin.kunjungan.create') }}" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+            Buat Kunjungan Manual
+        </a>
     </div>
 
     <div class="bg-white shadow rounded-lg">

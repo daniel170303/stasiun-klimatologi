@@ -81,27 +81,73 @@ class ExportController extends Controller
             'total_peserta' => $kunjungan->sum('jumlah_peserta'),
         ];
 
-        // Gunakan SVG logo (tidak butuh GD extension)
-        $logoPath = public_path('images/Logo_BMKG.svg');
-        $logoSvg = null;
+        // Convert logo to base64 (PNG atau SVG) - tanpa menggunakan GD
+        $logoPath = public_path('images/Logo_BMKG.png');
+        $logoBase64 = null;
         
         if (file_exists($logoPath)) {
-            // Baca file SVG langsung
-            $logoSvg = file_get_contents($logoPath);
+            try {
+                $imageData = file_get_contents($logoPath);
+                $logoBase64 = 'data:image/png;base64,' . base64_encode($imageData);
+            } catch (\Exception $e) {
+                $logoBase64 = null;
+            }
+        } else {
+            // Jika PNG tidak ada, coba SVG
+            $logoSvgPath = public_path('images/Logo_BMKG.svg');
+            if (file_exists($logoSvgPath)) {
+                try {
+                    $svgContent = file_get_contents($logoSvgPath);
+                    $logoBase64 = 'data:image/svg+xml;base64,' . base64_encode($svgContent);
+                } catch (\Exception $e) {
+                    $logoBase64 = null;
+                }
+            }
         }
 
+        // Prepare foto kunjungan dengan base64 - tanpa menggunakan GD
+        $kunjunganWithFoto = $kunjungan->map(function($item) {
+            if ($item->foto_kunjungan) {
+                $fotoPath = public_path('storage/' . $item->foto_kunjungan);
+                if (file_exists($fotoPath)) {
+                    try {
+                        $imageData = file_get_contents($fotoPath);
+                        $extension = strtolower(pathinfo($fotoPath, PATHINFO_EXTENSION));
+                        $mimeTypes = [
+                            'jpg' => 'image/jpeg',
+                            'jpeg' => 'image/jpeg',
+                            'png' => 'image/png',
+                            'gif' => 'image/gif',
+                            'webp' => 'image/webp'
+                        ];
+                        $mimeType = $mimeTypes[$extension] ?? 'image/jpeg';
+                        $item->foto_base64 = 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+                    } catch (\Exception $e) {
+                        $item->foto_base64 = null;
+                    }
+                } else {
+                    $item->foto_base64 = null;
+                }
+            } else {
+                $item->foto_base64 = null;
+            }
+            return $item;
+        });
+
         $pdf = Pdf::loadView('admin.export.pdf', [
-                'kunjungan' => $kunjungan,
+                'kunjungan' => $kunjunganWithFoto,
                 'statistik' => $statistik,
                 'period' => $this->getPeriodLabel($request),
-                'logoSvg' => $logoSvg, // kirim SVG string ke view
+                'logoBase64' => $logoBase64,
             ])
             ->setPaper('A4', 'portrait')
             ->setOptions([
                 'defaultFont' => 'sans-serif',
-                'isRemoteEnabled' => true, // PENTING: ubah jadi true
+                'isRemoteEnabled' => false,
                 'isHtml5ParserEnabled' => true,
                 'isFontSubsettingEnabled' => true,
+                'isPhpEnabled' => false,
+                'debugKeepTemp' => false,
             ]);
 
         $filename = $this->generateFilename($request, 'pdf');

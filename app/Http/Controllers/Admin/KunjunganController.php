@@ -7,9 +7,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\VerifikasiKunjunganRequest;
 use App\Mail\KunjunganStatusChanged;
 use App\Models\Kunjungan;
+use App\Models\Pengunjung;
 use App\Models\Pegawai;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 
 class KunjunganController extends Controller
 {
@@ -133,16 +135,35 @@ class KunjunganController extends Controller
         $request->validate([
             'status' => 'required|in:terlaksana,tidak_terlaksana',
             'keterangan_admin' => 'nullable|string',
+            'foto_kunjungan' => 'required_if:status,terlaksana|image|mimes:jpeg,png,jpg|max:5120',
+        ], [
+            'foto_kunjungan.required_if' => 'Foto kunjungan wajib diupload sebelum menandai terlaksana.',
+            'foto_kunjungan.image' => 'File harus berupa gambar.',
+            'foto_kunjungan.mimes' => 'Format file harus jpeg, png, atau jpg.',
+            'foto_kunjungan.max' => 'Ukuran file maksimal 5MB.',
         ]);
 
         $statusBaru = $request->status === 'terlaksana' 
             ? StatusKunjungan::TERLAKSANA 
             : StatusKunjungan::TIDAK_TERLAKSANA;
 
-        $kunjungan->update([
+        $data = [
             'status' => $statusBaru,
             'keterangan_admin' => $request->keterangan_admin,
-        ]);
+        ];
+
+        // Handle foto upload jika status terlaksana
+        if ($request->status === 'terlaksana' && $request->hasFile('foto_kunjungan')) {
+            // Hapus foto lama jika ada
+            if ($kunjungan->foto_kunjungan) {
+                Storage::disk('public')->delete($kunjungan->foto_kunjungan);
+            }
+            
+            $data['foto_kunjungan'] = $request->file('foto_kunjungan')
+                ->store('foto-kunjungan', 'public');
+        }
+
+        $kunjungan->update($data);
 
         if ($statusBaru === StatusKunjungan::TERLAKSANA) {
             $kunjungan->update(['status' => StatusKunjungan::SELESAI]);
@@ -158,5 +179,105 @@ class KunjunganController extends Controller
 
         return redirect()->route('admin.kunjungan.show', $kunjungan)
             ->with('success', 'Status kunjungan berhasil diperbarui!');
+    }
+
+    public function create()
+    {
+        $pengunjungList = Pengunjung::with('user')->get();
+        $occupiedDates = Kunjungan::whereIn('status', [
+                StatusKunjungan::MENUNGGU_KONFIRMASI,
+                StatusKunjungan::DIKONFIRMASI, 
+                StatusKunjungan::PETUGAS_DITUGASKAN,
+                StatusKunjungan::TERLAKSANA
+            ])
+            ->whereNotNull('tanggal_disetujui')
+            ->pluck('tanggal_disetujui')
+            ->map(function($date) {
+                return \Carbon\Carbon::parse($date)->format('Y-m-d');
+            })
+            ->unique()
+            ->values()
+            ->toArray();
+
+        return view('admin.kunjungan.create', compact('pengunjungList', 'occupiedDates'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'pengunjung_id' => ['required', 'exists:pengunjung,id'],
+            'tanggal_utama' => [
+                'required', 
+                'date', 
+                'after:today',
+                function ($attribute, $value, $fail) {
+                    $dayOfWeek = \Carbon\Carbon::parse($value)->dayOfWeek;
+                    // Only allow Monday (1) to Thursday (4)
+                    if (!in_array($dayOfWeek, [1, 2, 3, 4])) {
+                        $dayName = \Carbon\Carbon::parse($value)->locale('id')->dayName;
+                        $fail('Tanggal ' . \Carbon\Carbon::parse($value)->format('d F Y') . ' (' . $dayName . ') tidak dapat dipilih. Kunjungan hanya dapat dilakukan pada hari Senin sampai Kamis.');
+                    }
+                    
+                    if (Kunjungan::where('tanggal_disetujui', $value)
+                        ->whereIn('status', [
+                            StatusKunjungan::MENUNGGU_KONFIRMASI,
+                            StatusKunjungan::DIKONFIRMASI, 
+                            StatusKunjungan::PETUGAS_DITUGASKAN,
+                            StatusKunjungan::TERLAKSANA
+                        ])
+                        ->exists()) {
+                        $fail('Tanggal ' . \Carbon\Carbon::parse($value)->format('d F Y') . ' sudah ada kunjungan.');
+                    }
+                },
+            ],
+            'tanggal_alternatif' => [
+                'nullable', 
+                'date', 
+                'after:today',
+            ],
+            'jumlah_peserta' => ['required', 'integer', 'min:1', 'max:100'],
+            'tujuan_kunjungan' => ['required', 'string', 'max:1000'],
+            'surat_permohonan' => ['nullable', 'file', 'mimes:pdf', 'max:2048'],
+        ], [
+            'pengunjung_id.required' => 'Pengunjung wajib dipilih.',
+            'pengunjung_id.exists' => 'Pengunjung tidak ditemukan.',
+            'tanggal_utama.required' => 'Tanggal utama wajib diisi.',
+            'tanggal_utama.after' => 'Tanggal utama harus setelah hari ini.',
+            'jumlah_peserta.required' => 'Jumlah peserta wajib diisi.',
+            'tujuan_kunjungan.required' => 'Tujuan kunjungan wajib diisi.',
+        ]);
+
+        $data = [
+            'pengunjung_id' => $request->pengunjung_id,
+            'tanggal_utama' => $request->tanggal_utama,
+            'tanggal_alternatif' => $request->tanggal_alternatif,
+            'tanggal_disetujui' => $request->tanggal_utama, // Langsung set sebagai tanggal disetujui
+            'jumlah_peserta' => $request->jumlah_peserta,
+            'tujuan_kunjungan' => $request->tujuan_kunjungan,
+            'status' => StatusKunjungan::DIKONFIRMASI, // Langsung dikonfirmasi karena dibuat admin
+        ];
+
+        // Handle file upload jika ada
+        if ($request->hasFile('surat_permohonan')) {
+            $data['surat_permohonan'] = $request->file('surat_permohonan')
+                ->store('surat-permohonan', 'public');
+        }
+
+        $kunjungan = Kunjungan::create($data);
+
+        // Kirim notifikasi email
+        try {
+            Mail::to($kunjungan->pengunjung->email)->send(
+                new KunjunganStatusChanged(
+                    $kunjungan,
+                    'Admin telah membuat kunjungan untuk Anda. Kunjungan telah dikonfirmasi dan siap untuk ditugaskan petugas.'
+                )
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to send email: ' . $e->getMessage());
+        }
+
+        return redirect()->route('admin.kunjungan.show', $kunjungan)
+            ->with('success', 'Kunjungan berhasil dibuat!');
     }
 }

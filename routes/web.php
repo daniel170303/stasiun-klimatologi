@@ -67,6 +67,12 @@ Route::middleware(['auth', 'role:admin'])
         Route::get('/kunjungan', [AdminKunjunganController::class, 'index'])
             ->name('kunjungan.index');
 
+        Route::get('/kunjungan/create', [AdminKunjunganController::class, 'create'])
+            ->name('kunjungan.create');
+
+        Route::post('/kunjungan', [AdminKunjunganController::class, 'store'])
+            ->name('kunjungan.store');
+
         Route::get('/kunjungan/{kunjungan}', [AdminKunjunganController::class, 'show'])
             ->name('kunjungan.show');
 

@@ -30,9 +30,10 @@ class KunjunganRequest extends FormRequest
                 'date', 
                 'after:today',
                 function ($attribute, $value, $fail) {
-                    // Check if weekend
-                    if ($this->isWeekend($value)) {
-                        $fail('Tanggal ' . Carbon::parse($value)->format('d F Y') . ' adalah hari libur (Sabtu/Minggu). Silakan pilih hari kerja.');
+                    // Check if valid day (Monday-Thursday only)
+                    if (!$this->isValidDay($value)) {
+                        $dayName = Carbon::parse($value)->locale('id')->dayName;
+                        $fail('Tanggal ' . Carbon::parse($value)->format('d F Y') . ' (' . $dayName . ') tidak dapat dipilih. Kunjungan hanya dapat dilakukan pada hari Senin sampai Kamis.');
                     }
                     
                     // Check if date is occupied
@@ -47,9 +48,10 @@ class KunjunganRequest extends FormRequest
                 'after:today',
                 function ($attribute, $value, $fail) {
                     if ($value) {
-                        // Check if weekend
-                        if ($this->isWeekend($value)) {
-                            $fail('Tanggal alternatif ' . Carbon::parse($value)->format('d F Y') . ' adalah hari libur (Sabtu/Minggu). Silakan pilih hari kerja.');
+                        // Check if valid day (Monday-Thursday only)
+                        if (!$this->isValidDay($value)) {
+                            $dayName = Carbon::parse($value)->locale('id')->dayName;
+                            $fail('Tanggal alternatif ' . Carbon::parse($value)->format('d F Y') . ' (' . $dayName . ') tidak dapat dipilih. Kunjungan hanya dapat dilakukan pada hari Senin sampai Kamis.');
                         }
                         
                         // Check if date is occupied
@@ -98,6 +100,19 @@ class KunjunganRequest extends FormRequest
         $dayOfWeek = Carbon::parse($date)->dayOfWeek;
         // 0 = Sunday, 6 = Saturday
         return in_array($dayOfWeek, [0, 6]);
+    }
+
+    /**
+     * Check if date is valid day (Monday-Thursday only)
+     *
+     * @param string $date
+     * @return bool
+     */
+    private function isValidDay($date): bool
+    {
+        $dayOfWeek = Carbon::parse($date)->dayOfWeek;
+        // 1 = Monday, 2 = Tuesday, 3 = Wednesday, 4 = Thursday
+        return in_array($dayOfWeek, [1, 2, 3, 4]);
     }
 
     /**

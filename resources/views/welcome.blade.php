@@ -58,8 +58,33 @@
                 </h1>
                 
                 <p class="text-lg md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
-                    Platform digital resmi untuk mengajukan dan mengelola jadwal kunjungan ke Stasiun Klimatologi IV BMKG dengan mudah, cepat, dan efisien.
+                    Platform digital resmi untuk mengajukan dan mengelola jadwal kunjungan ke Stasiun Klimatologi Kelas IV DIY dengan mudah, cepat, dan efisien.
                 </p>
+
+                <!-- Konsultasi Notice -->
+                <div class="max-w-3xl mx-auto mb-8 bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6 shadow-lg">
+                    <div class="flex items-start gap-4">
+                        <div class="flex-shrink-0">
+                            <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-lg font-bold text-yellow-900 mb-2">Penting: Konsultasi Terlebih Dahulu</h3>
+                            <p class="text-yellow-800 mb-3">
+                                Sebelum mengajukan kunjungan, kami sangat menyarankan untuk melakukan <strong>konsultasi terlebih dahulu</strong> melalui WhatsApp. 
+                                Konsultasi akan membantu kami memahami kebutuhan Anda dan memastikan kunjungan berjalan dengan optimal.
+                            </p>
+                            <a href="https://wa.me/628112638113" target="_blank" 
+                               class="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition duration-200 shadow-md hover:shadow-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M20.52 3.48A11.91 11.91 0 0012.05 0C5.5 0 .2 5.3.2 11.85c0 2.1.55 4.15 1.6 5.95L0 24l6.4-1.7a11.85 11.85 0 005.65 1.45h.05c6.55 0 11.85-5.3 11.85-11.85 0-3.15-1.25-6.1-3.43-8.42z"/>
+                                </svg>
+                                Konsultasi via WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                </div>
                 
                 @guest
                 <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-8">
@@ -84,9 +109,6 @@
     <div class="bg-white py-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
-                <span class="inline-block px-4 py-2 rounded-full text-sm font-semibold bg-indigo-100 text-indigo-700 mb-4">
-                    Mengapa Memilih Kami
-                </span>
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Fitur Unggulan</h2>
                 <p class="text-lg text-gray-600 max-w-2xl mx-auto">Kemudahan dan efisiensi dalam setiap langkah proses kunjungan Anda</p>
             </div>

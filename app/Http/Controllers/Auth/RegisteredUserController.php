@@ -33,6 +33,7 @@ class RegisteredUserController extends Controller
     {
         $request->validate([
             'nama_instansi' => ['required', 'string', 'max:255'],
+            'jenjang' => ['required', 'string', 'max:255'],
             'nama_penanggung_jawab' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'no_hp' => ['required', 'string', 'max:20'],
@@ -40,6 +41,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ], [
             'nama_instansi.required' => 'Nama instansi wajib diisi.',
+            'jenjang.required' => 'Jenjang wajib dipilih.',
             'nama_penanggung_jawab.required' => 'Nama penanggung jawab wajib diisi.',
             'email.required' => 'Email wajib diisi.',
             'email.unique' => 'Email sudah terdaftar.',
@@ -60,6 +62,7 @@ class RegisteredUserController extends Controller
         Pengunjung::create([
             'user_id' => $user->id,
             'nama_instansi' => $request->nama_instansi,
+            'jenjang' => $request->jenjang,
             'nama_penanggung_jawab' => $request->nama_penanggung_jawab,
             'email' => $request->email,
             'no_hp' => $request->no_hp,

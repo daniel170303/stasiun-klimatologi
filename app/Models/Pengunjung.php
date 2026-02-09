@@ -15,6 +15,7 @@ class Pengunjung extends Model
     protected $fillable = [
         'user_id',
         'nama_instansi',
+        'jenjang',
         'nama_penanggung_jawab',
         'email',
         'no_hp',

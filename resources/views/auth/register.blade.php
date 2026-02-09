@@ -63,6 +63,59 @@
                         </div>
                     </div>
 
+                    <!-- Jenjang -->
+                    <div class="md:col-span-2">
+                        <label for="jenjang" class="block text-sm font-medium text-gray-700 mb-2">
+                            Jenjang <span class="text-red-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                                </svg>
+                            </div>
+                            <select 
+                                id="jenjang" 
+                                name="jenjang" 
+                                required
+                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                            >
+                                <option value="">Pilih Jenjang</option>
+                                <optgroup label="PAUD">
+                                    <option value="PAUD Negeri" {{ old('jenjang') == 'PAUD Negeri' ? 'selected' : '' }}>PAUD Negeri</option>
+                                    <option value="PAUD Swasta" {{ old('jenjang') == 'PAUD Swasta' ? 'selected' : '' }}>PAUD Swasta</option>
+                                </optgroup>
+                                <optgroup label="TK">
+                                    <option value="TK Negeri" {{ old('jenjang') == 'TK Negeri' ? 'selected' : '' }}>TK Negeri</option>
+                                    <option value="TK Swasta" {{ old('jenjang') == 'TK Swasta' ? 'selected' : '' }}>TK Swasta</option>
+                                </optgroup>
+                                <optgroup label="SD">
+                                    <option value="SD Negeri" {{ old('jenjang') == 'SD Negeri' ? 'selected' : '' }}>SD Negeri</option>
+                                    <option value="SD Swasta" {{ old('jenjang') == 'SD Swasta' ? 'selected' : '' }}>SD Swasta</option>
+                                </optgroup>
+                                <optgroup label="SMP">
+                                    <option value="SMP Negeri" {{ old('jenjang') == 'SMP Negeri' ? 'selected' : '' }}>SMP Negeri</option>
+                                    <option value="SMP Swasta" {{ old('jenjang') == 'SMP Swasta' ? 'selected' : '' }}>SMP Swasta</option>
+                                </optgroup>
+                                <optgroup label="SMA">
+                                    <option value="SMA Negeri" {{ old('jenjang') == 'SMA Negeri' ? 'selected' : '' }}>SMA Negeri</option>
+                                    <option value="SMA Swasta" {{ old('jenjang') == 'SMA Swasta' ? 'selected' : '' }}>SMA Swasta</option>
+                                </optgroup>
+                                <optgroup label="SMK">
+                                    <option value="SMK Negeri" {{ old('jenjang') == 'SMK Negeri' ? 'selected' : '' }}>SMK Negeri</option>
+                                    <option value="SMK Swasta" {{ old('jenjang') == 'SMK Swasta' ? 'selected' : '' }}>SMK Swasta</option>
+                                </optgroup>
+                                <optgroup label="Perguruan Tinggi">
+                                    <option value="Perguruan Tinggi Negeri" {{ old('jenjang') == 'Perguruan Tinggi Negeri' ? 'selected' : '' }}>Perguruan Tinggi Negeri</option>
+                                    <option value="Perguruan Tinggi Swasta" {{ old('jenjang') == 'Perguruan Tinggi Swasta' ? 'selected' : '' }}>Perguruan Tinggi Swasta</option>
+                                </optgroup>
+                                <optgroup label="Lainnya">
+                                    <option value="Lainnya" {{ old('jenjang') == 'Lainnya' ? 'selected' : '' }}>Lainnya</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Nama Penanggung Jawab -->
                     <div>
                         <label for="nama_penanggung_jawab" class="block text-sm font-medium text-gray-700 mb-2">

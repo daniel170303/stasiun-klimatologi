@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Pengunjung;
 
 use App\Http\Controllers\Controller;
 use App\Models\Kunjungan;
+use App\Enums\StatusKunjungan;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
@@ -41,11 +43,28 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // Ambil tanggal yang sudah terisi untuk kalender
+        $occupiedDates = Kunjungan::whereIn('status', [
+                StatusKunjungan::MENUNGGU_KONFIRMASI,
+                StatusKunjungan::DIKONFIRMASI, 
+                StatusKunjungan::PETUGAS_DITUGASKAN,
+                StatusKunjungan::TERLAKSANA
+            ])
+            ->whereNotNull('tanggal_disetujui')
+            ->pluck('tanggal_disetujui')
+            ->map(function($date) {
+                return Carbon::parse($date)->format('Y-m-d');
+            })
+            ->unique()
+            ->values()
+            ->toArray();
+
         return view('pengunjung.dashboard', compact(
             'totalKunjungan',
             'kunjunganDiajukan',
             'kunjunganTerlaksana',
-            'kunjunganTerbaru'
+            'kunjunganTerbaru',
+            'occupiedDates'
         ));
     }
 }

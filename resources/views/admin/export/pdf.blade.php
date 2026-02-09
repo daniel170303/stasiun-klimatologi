@@ -119,7 +119,11 @@
                     @if(isset($logoBase64) && $logoBase64)
                         <img src="{{ $logoBase64 }}"
                              alt="Logo BMKG"
-                             style="width:70px; height:auto;">
+                             style="width:70px; height:auto; max-width:70px;">
+                    @else
+                        <div style="font-size:10px; font-weight:bold; text-align:center;">
+                            BMKG
+                        </div>
                     @endif
                 </td>
 
@@ -186,12 +190,13 @@
             <tr>
                 <th width="3%">No</th>
                 <th width="10%">Tanggal</th>
-                <th width="20%">Instansi</th>
-                <th width="15%">Penanggung Jawab</th>
-                <th width="8%">Peserta</th>
-                <th width="12%">Status</th>
-                <th width="17%">Petugas</th>
-                <th width="15%">Keterangan</th>
+                <th width="18%">Instansi</th>
+                <th width="13%">Penanggung Jawab</th>
+                <th width="7%">Peserta</th>
+                <th width="10%">Status</th>
+                <th width="15%">Petugas</th>
+                <th width="12%">Keterangan</th>
+                <th width="12%">Foto</th>
             </tr>
         </thead>
         <tbody>
@@ -213,6 +218,17 @@
                 </td>
                 <td>{{ $item->petugas->pluck('nama')->join(', ') ?: '-' }}</td>
                 <td>{{ Str::limit($item->keterangan_admin ?: '-', 50) }}</td>
+                <td style="text-align:center;">
+                    @if(isset($item->foto_base64) && $item->foto_base64)
+                        <img src="{{ $item->foto_base64 }}" 
+                             alt="Foto Kunjungan" 
+                             style="width:40px; height:40px; object-fit:cover; border:1px solid #ddd; display:block; margin:0 auto;">
+                    @elseif($item->foto_kunjungan)
+                        <span style="font-size:9px; color:#065F46; font-weight:bold;">✓ Ada Foto</span>
+                    @else
+                        <span style="font-size:9px; color:#999;">-</span>
+                    @endif
+                </td>
             </tr>
             @endforeach
         </tbody>

@@ -135,8 +135,15 @@
                     @endif
                     
                     @if(in_array($kunjungan->status->value, ['petugas_ditugaskan']))
-                    <form method="POST" action="{{ route('admin.kunjungan.update-status', $kunjungan) }}" class="space-y-3">
+                    <form method="POST" action="{{ route('admin.kunjungan.update-status', $kunjungan) }}" enctype="multipart/form-data" class="space-y-3">
                         @csrf
+                        <div>
+                            <label for="foto_kunjungan" class="block text-sm font-medium text-gray-700 mb-2">
+                                Foto Kunjungan <span class="text-red-500">*</span> <span class="text-xs text-gray-500">(Wajib untuk status Terlaksana)</span>
+                            </label>
+                            <input type="file" name="foto_kunjungan" id="foto_kunjungan" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                            <p class="mt-1 text-xs text-gray-500">Format: JPG, PNG, JPEG. Maksimal 5MB</p>
+                        </div>
                         <textarea name="keterangan_admin" rows="3" placeholder="Keterangan (opsional)" class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"></textarea>
                         <button type="submit" name="status" value="terlaksana" class="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
                             Tandai Terlaksana
@@ -145,6 +152,13 @@
                             Tandai Tidak Terlaksana
                         </button>
                     </form>
+                    @endif
+                    
+                    @if($kunjungan->foto_kunjungan)
+                    <div class="mt-4">
+                        <p class="text-sm font-medium text-gray-700 mb-2">Foto Kunjungan:</p>
+                        <img src="{{ Storage::url($kunjungan->foto_kunjungan) }}" alt="Foto Kunjungan" class="w-full rounded-md shadow-md">
+                    </div>
                     @endif
                 </div>
             </div>
