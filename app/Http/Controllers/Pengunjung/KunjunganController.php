@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Mail\KunjunganBaruNotification; // Import Mailable baru
 
 class KunjunganController extends Controller
 {
@@ -23,7 +24,7 @@ class KunjunganController extends Controller
     public function index(Request $request)
     {
         $pengunjung = auth()->user()->pengunjung;
-        
+
         $query = Kunjungan::where('pengunjung_id', $pengunjung->id)
             ->with('petugas');
 
@@ -46,20 +47,20 @@ class KunjunganController extends Controller
     {
         // Get all occupied dates (dates with verified visits)
         $occupiedDates = Kunjungan::whereIn('status', [
-                StatusKunjungan::MENUNGGU_KONFIRMASI,
-                StatusKunjungan::DIKONFIRMASI, 
-                StatusKunjungan::PETUGAS_DITUGASKAN,
-                StatusKunjungan::TERLAKSANA
-            ])
+            StatusKunjungan::MENUNGGU_KONFIRMASI,
+            StatusKunjungan::DIKONFIRMASI,
+            StatusKunjungan::PETUGAS_DITUGASKAN,
+            StatusKunjungan::TERLAKSANA
+        ])
             ->whereNotNull('tanggal_disetujui')
             ->pluck('tanggal_disetujui')
-            ->map(function($date) {
-                return Carbon::parse($date)->format('Y-m-d');
-            })
+            ->map(function ($date) {
+            return Carbon::parse($date)->format('Y-m-d');
+        })
             ->unique()
             ->values()
             ->toArray();
-        
+
         return view('pengunjung.kunjungan.create', compact('occupiedDates'));
     }
 
@@ -90,7 +91,14 @@ class KunjunganController extends Controller
             Mail::to($pengunjung->email)->send(
                 new KunjunganStatusChanged($kunjungan, 'Pengajuan kunjungan Anda telah diterima dan sedang diproses.')
             );
-        } catch (\Exception $e) {
+
+            // Send notification to Admin (Institution Email)
+            Mail::to('stasiunklimatologikelasiv@gmail.com')->send(
+                new KunjunganBaruNotification($kunjungan)
+            );
+
+        }
+        catch (\Exception $e) {
             // Log error but don't stop the process
             \Log::error('Failed to send email: ' . $e->getMessage());
         }
@@ -109,7 +117,7 @@ class KunjunganController extends Controller
     {
         // Check authorization - make sure user owns this kunjungan
         $pengunjung = auth()->user()->pengunjung;
-        
+
         if ($kunjungan->pengunjung_id !== $pengunjung->id) {
             abort(403, 'Anda tidak memiliki akses ke kunjungan ini.');
         }
@@ -129,7 +137,7 @@ class KunjunganController extends Controller
     {
         // Check authorization
         $pengunjung = auth()->user()->pengunjung;
-        
+
         if ($kunjungan->pengunjung_id !== $pengunjung->id) {
             abort(403, 'Anda tidak memiliki akses ke kunjungan ini.');
         }
@@ -152,7 +160,7 @@ class KunjunganController extends Controller
     {
         // Check authorization
         $pengunjung = auth()->user()->pengunjung;
-        
+
         if ($kunjungan->pengunjung_id !== $pengunjung->id) {
             abort(403, 'Anda tidak memiliki akses ke kunjungan ini.');
         }
@@ -171,7 +179,8 @@ class KunjunganController extends Controller
             ]);
 
             $message = 'Terima kasih telah mengkonfirmasi jadwal kunjungan. Kami akan segera menugaskan petugas.';
-        } else {
+        }
+        else {
             $kunjungan->update([
                 'status' => StatusKunjungan::TIDAK_TERLAKSANA,
             ]);
@@ -184,7 +193,8 @@ class KunjunganController extends Controller
             Mail::to($kunjungan->pengunjung->email)->send(
                 new KunjunganStatusChanged($kunjungan, $message)
             );
-        } catch (\Exception $e) {
+        }
+        catch (\Exception $e) {
             \Log::error('Failed to send email: ' . $e->getMessage());
         }
 
