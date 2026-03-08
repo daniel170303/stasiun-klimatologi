@@ -17,5 +17,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Kunjungan::class, KunjunganPolicy::class);
+
+        // Memaksa seluruh tautan URL yang dibuat agar menggunakan HTTPS sesuai policy keamanan
+        if($this->app->environment('production') || env('APP_URL') == 'https://localhost') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 }
